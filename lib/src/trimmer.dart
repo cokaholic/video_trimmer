@@ -164,6 +164,7 @@ class Trimmer {
     required double endValue,
     required Function(String? outputPath) onSave,
     bool applyVideoEncoding = false,
+    bool overwriteFileEnabled = false,
     FileFormat? outputFormat,
     String? ffmpegCommand,
     String? customVideoFormat,
@@ -178,11 +179,10 @@ class Trimmer {
 
     String command;
 
-
     String outputPath;
     String? outputFormatString;
-    String formattedDateTime = (DateTime.now().millisecondsSinceEpoch/1000)
-        .toString();
+    String formattedDateTime =
+        (DateTime.now().millisecondsSinceEpoch / 1000).toString();
 
     videoFolderName ??= "Trimmer";
 
@@ -214,7 +214,7 @@ class Trimmer {
     }
 
     String trimLengthCommand =
-        ' -ss $startPoint -i "$videoPath" -movflags use_metadata_tags -t '
+        ' -ss $startPoint ${overwriteFileEnabled ? '-y' : ''} -i "$videoPath" -movflags use_metadata_tags -t '
         '${endPoint - startPoint} -avoid_negative_ts make_zero  ';
 
     if (ffmpegCommand == null) {
@@ -294,7 +294,7 @@ class Trimmer {
   /// Clean up
   void dispose() {
     _controller.close();
-    if(_videoPlayerController != null) {
+    if (_videoPlayerController != null) {
       _videoPlayerController!.dispose();
     }
   }
